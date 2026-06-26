@@ -45,7 +45,7 @@ You can also wrap the incoming request and extract data from it:
 require_once __DIR__ . '/vendor/autoload.php';
 
 use PhpResponses\RequestFromEnv;
-use PhpResponses\BodyFromRequest;
+use PhpResponses\BodyTextFromRequest;
 use PhpResponses\ResponseStatusLineOk;
 use PhpResponses\ResponseHeader;
 use PhpResponses\ResponseBody;
@@ -54,7 +54,7 @@ use PhpResponses\MediaToWire;
 $request = new RequestFromEnv();
 
 $agent = $request->header("User-Agent");
-$body = (new BodyFromRequest($request))->string();
+$body = (new BodyTextFromRequest($request))->string();
 $method = $request->requestLine()->method();
 $path = $request->requestLine()->path();
 
@@ -75,4 +75,41 @@ $path = $request->requestLine()->path();
 ```
 
 Now just open this file in your browser via a web server (like `php -S localhost:8000`).
-`).
+
+## JSON Request Example
+
+You can also parse JSON requests:
+
+```php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use PhpResponses\RequestFromEnv;
+use PhpResponses\BodyTextFromRequest;
+use PhpResponses\ResponseStatusLineOk;
+use PhpResponses\ResponseHeader;
+use PhpResponses\ResponseBody;
+use PhpResponses\MediaToWire;
+use PhpResponses\JsonSubTree;
+use PhpResponses\JsonString;
+use PhpResponses\JsonInt;
+
+$body = new BodyTextFromRequest(new RequestFromEnv());
+$userNode = new JsonSubTree($body, 'user');
+$name = new JsonString($userNode, 'name');
+$age  = new JsonInt($userNode, 'age');
+
+(new ResponseStatusLineOk(
+    new ResponseHeader(
+        new ResponseBody(
+            sprintf(
+                "<html><body><h1>Hello, %s!</h1><p>You are %d years old.</p></body></html>",
+                $name->string(),
+                $age->int()
+            )
+        ),
+        "Content-Type", "text/html"
+    )
+))->media(new MediaToWire());
+```

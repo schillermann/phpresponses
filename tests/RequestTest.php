@@ -10,14 +10,14 @@ final class RequestTest extends TestCase
 {
     public function testRequestData(): void
     {
-        $request = new FakeRequest(
-            ["User-Agent" => "Mozilla/5.0"],
+        $request = new RequestFromEnvFake(
+            ["HTTP_USER_AGENT" => "Mozilla/5.0"],
             "test body"
         );
         
         $this->assertTrue($request->header("User-Agent")->exists());
         $this->assertEquals("Mozilla/5.0", $request->header("User-Agent")->string());
-        $this->assertEquals("test body", (new BodyFromRequest($request))->string());
+        $this->assertEquals("test body", (new BodyTextFromRequest($request))->string());
     }
 
     public function testLiveHeaderMapping(): void
@@ -42,5 +42,17 @@ final class RequestTest extends TestCase
         $this->assertEquals('/save', $line->path());
         $this->assertEquals('id=1', $line->query());
         $this->assertEquals('HTTP/2', $line->protocol());
+    }
+
+    public function testRequestFromEnvFakeRequestLine(): void
+    {
+        $request = new RequestFromEnvFake([
+            'REQUEST_METHOD' => 'DELETE',
+            'REQUEST_URI' => '/items/123'
+        ]);
+
+        $line = $request->requestLine();
+        $this->assertEquals('DELETE', $line->method());
+        $this->assertEquals('/items/123', $line->path());
     }
 }

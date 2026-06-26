@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace PhpResponses;
 
-final class FakeRequest implements Request
+final class RequestFromEnvFake implements Request
 {
-    private array $headers;
+    private array $server;
     private string $body;
 
-    private RequestLine $line;
-
-    public function __construct(array $headers = [], string $body = "", RequestLine $line = null)
+    public function __construct(array $server = [], string $body = "")
     {
-        $this->headers = $headers;
+        $this->server = $server;
         $this->body = $body;
-        $this->line = $line ?? new FakeRequestLine();
     }
 
     public function requestLine(): RequestLine
     {
-        return $this->line;
+        return new RequestLineFromEnv($this->server);
     }
 
     public function header(string $name): Header
     {
-        return new FakeHeader($this->headers[$name] ?? null);
+        return new HeaderFromEnv($name, $this->server);
     }
 
     public function body()
