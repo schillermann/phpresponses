@@ -37,33 +37,37 @@ use PhpResponses\MediaToWire;
 
 ## Request Example
 
-You can also wrap the incoming request and extract data from it:
+You can also use classes from `PhpResponses\Request` to extract data from the request environment:
 
 ```php
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\RequestFromEnv;
-use PhpResponses\BodyTextFromRequest;
+use PhpResponses\Request\BodyFromEnv;
+use PhpResponses\Request\HeaderFromEnv;
+use PhpResponses\Request\MethodFromEnv;
+use PhpResponses\Request\PathFromEnv;
 use PhpResponses\ResponseStatusLineOk;
 use PhpResponses\ResponseHeader;
 use PhpResponses\ResponseBody;
 use PhpResponses\MediaToWire;
 
-$request = new RequestFromEnv();
-
-$agent = $request->header("User-Agent");
-$body = (new BodyTextFromRequest($request))->string();
-$method = $request->requestLine()->method();
-$path = $request->requestLine()->path();
+try {
+    $agent = (new HeaderFromEnv("User-Agent"))->string();
+} catch (\OutOfBoundsException $e) {
+    $agent = "Unknown";
+}
+$body = (new BodyFromEnv())->string();
+$method = (new MethodFromEnv())->string();
+$path = (new PathFromEnv())->string();
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
         new ResponseBody(
             sprintf(
                 "<html><body><h1>Your Browser: %s</h1><p>Method: %s</p><p>Path: %s</p><p>Body: %s</p></body></html>",
-                $agent->exists() ? $agent->string() : "Unknown",
+                $agent,
                 $method,
                 $path,
                 $body
@@ -85,8 +89,7 @@ You can also parse JSON requests:
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\RequestFromEnv;
-use PhpResponses\BodyTextFromRequest;
+use PhpResponses\Request\BodyFromEnv;
 use PhpResponses\ResponseStatusLineOk;
 use PhpResponses\ResponseHeader;
 use PhpResponses\ResponseBody;
@@ -95,7 +98,7 @@ use PhpResponses\JsonSubTree;
 use PhpResponses\JsonString;
 use PhpResponses\JsonInt;
 
-$body = new BodyTextFromRequest(new RequestFromEnv());
+$body = new BodyFromEnv();
 $userNode = new JsonSubTree($body, 'user');
 $name = new JsonString($userNode, 'name');
 $age  = new JsonInt($userNode, 'age');
