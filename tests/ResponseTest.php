@@ -12,7 +12,7 @@ final class ResponseTest extends TestCase
     {
         $media = (new ResponseStatusLineOk(
             new ResponseHeader(
-                new ResponseBody("Hello!"),
+                new ResponseBody(new LiteralText("Hello!")),
                 "X-Custom", "Value"
             )
         ))->media(new FakeMedia());

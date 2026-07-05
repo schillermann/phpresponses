@@ -27,10 +27,10 @@ final class FakeMedia implements Media
         return new self($newLog);
     }
 
-    public function body(string $content): Media
+    public function body(Text $content): Media
     {
         $newLog = $this->log;
-        $newLog[] = "body: $content";
+        $newLog[] = "body: " . $content->string();
         return new self($newLog);
     }
 

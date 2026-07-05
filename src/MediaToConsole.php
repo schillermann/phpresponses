@@ -18,9 +18,9 @@ final class MediaToConsole implements Media
         return new self();
     }
 
-    public function body(string $content): Media
+    public function body(Text $content): Media
     {
-        echo "\n{$content}";
+        echo "\n{$content->string()}";
         return new self();
     }
 }

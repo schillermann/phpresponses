@@ -6,9 +6,9 @@ namespace PhpResponses;
 
 final class ResponseBody implements Response
 {
-    private string $content;
+    private Text $content;
 
-    public function __construct(string $content)
+    public function __construct(Text $content)
     {
         $this->content = $content;
     }

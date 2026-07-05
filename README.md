@@ -26,10 +26,11 @@ use PhpResponses\ResponseBody;
 use PhpResponses\ResponseHeader;
 use PhpResponses\ResponseStatusLineOk;
 use PhpResponses\MediaToWire;
+use PhpResponses\LiteralText;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
-        new ResponseBody("<h1>Hello from PhpResponses!</h1>"),
+        new ResponseBody(new LiteralText("<h1>Hello from PhpResponses!</h1>")),
         "Content-Type", "text/html"
     )
 ))->media(new MediaToWire());
@@ -37,40 +38,62 @@ use PhpResponses\MediaToWire;
 
 ## Request Example
 
-You can also use classes from `PhpResponses\Request` and compose request parsing declaratively using templates:
+You can compose request parsing declaratively by encapsulating the request variables in a custom class representing the request details:
+
+```php
+<?php
+
+use PhpResponses\Text;
+use PhpResponses\TemplateVariable;
+use PhpResponses\LiteralText;
+use PhpResponses\FallbackText;
+use PhpResponses\Request\HeaderFromEnv;
+use PhpResponses\Request\MethodFromEnv;
+use PhpResponses\Request\PathFromEnv;
+use PhpResponses\Request\BodyFromEnv;
+
+final class RequestDetailsText implements Text {
+    public function string(): string {
+        return (new TemplateVariable(
+            new TemplateVariable(
+                new TemplateVariable(
+                    new TemplateVariable(
+                        new LiteralText("<html><body><h1>Your Browser: ${agent}</h1><p>Method: ${method}</p><p>Path: ${path}</p><p>Body: ${body}</p></body></html>"),
+                        "agent",
+                        new FallbackText(
+                            new HeaderFromEnv("User-Agent"),
+                            new LiteralText("Unknown")
+                        )
+                    ),
+                    "method",
+                    new MethodFromEnv()
+                ),
+                "path",
+                new PathFromEnv()
+            ),
+            "body",
+            new BodyFromEnv()
+        ))->string();
+    }
+}
+```
+
+Now, compose the response cleanly:
 
 ```php
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\Request\BodyFromEnv;
-use PhpResponses\Request\HeaderFromEnv;
-use PhpResponses\Request\MethodFromEnv;
-use PhpResponses\Request\PathFromEnv;
 use PhpResponses\ResponseStatusLineOk;
 use PhpResponses\ResponseHeader;
 use PhpResponses\ResponseBody;
 use PhpResponses\MediaToWire;
-use PhpResponses\Template;
-use PhpResponses\LiteralText;
-use PhpResponses\FallbackText;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
         new ResponseBody(
-            new Template(
-                new LiteralText("<html><body><h1>Your Browser: ${agent}</h1><p>Method: ${method}</p><p>Path: ${path}</p><p>Body: ${body}</p></body></html>"),
-                [
-                    "agent" => new FallbackText(
-                        new HeaderFromEnv("User-Agent"),
-                        new LiteralText("Unknown")
-                    ),
-                    "method" => new MethodFromEnv(),
-                    "path" => new PathFromEnv(),
-                    "body" => new BodyFromEnv()
-                ]
-            )
+            new RequestDetailsText()
         ),
         "Content-Type", "text/html"
     )
@@ -81,11 +104,45 @@ Now just open this file in your browser via a web server (like `php -S localhost
 
 ## JSON Request Example
 
-You can parse JSON requests declaratively using templates.
+You can parse JSON requests declaratively using template variables.
 
 ### Inline Template Example
 
-If you want to render the response using an in-memory template string:
+If you want to render the response using an in-memory template string, define your view class:
+
+```php
+<?php
+
+use PhpResponses\Text;
+use PhpResponses\Number;
+use PhpResponses\TemplateVariable;
+use PhpResponses\LiteralText;
+use PhpResponses\TextOfNumber;
+
+final class UserWelcomeText implements Text {
+    private Text $name;
+    private Number $age;
+
+    public function __construct(Text $name, Number $age) {
+        $this->name = $name;
+        $this->age = $age;
+    }
+
+    public function string(): string {
+        return (new TemplateVariable(
+            new TemplateVariable(
+                new LiteralText("<html><body><h1>Hello, ${name}!</h1><p>You are ${age} years old.</p></body></html>"),
+                "name",
+                $this->name
+            ),
+            "age",
+            new TextOfNumber($this->age)
+        ))->string();
+    }
+}
+```
+
+Now, pass this view to `ResponseBody`:
 
 ```php
 <?php
@@ -100,27 +157,19 @@ use PhpResponses\MediaToWire;
 use PhpResponses\JsonSubTree;
 use PhpResponses\JsonString;
 use PhpResponses\JsonInt;
-use PhpResponses\Template;
-use PhpResponses\LiteralText;
-use PhpResponses\TextOfNumber;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
         new ResponseBody(
-            new Template(
-                new LiteralText("<html><body><h1>Hello, ${name}!</h1><p>You are ${age} years old.</p></body></html>"),
-                [
-                    "name" => new JsonString(
-                        new JsonSubTree(new BodyFromEnv(), 'user'),
-                        'name'
-                    ),
-                    "age" => new TextOfNumber(
-                        new JsonInt(
-                            new JsonSubTree(new BodyFromEnv(), 'user'),
-                            'age'
-                        )
-                    )
-                ]
+            new UserWelcomeText(
+                new JsonString(
+                    new JsonSubTree(new BodyFromEnv(), 'user'),
+                    'name'
+                ),
+                new JsonInt(
+                    new JsonSubTree(new BodyFromEnv(), 'user'),
+                    'age'
+                )
             )
         ),
         "Content-Type", "text/html"
@@ -128,9 +177,44 @@ use PhpResponses\TextOfNumber;
 ))->media(new MediaToWire());
 ```
 
-### External Template Example
+### Encapsulated Template Example (Best Practice)
 
-If you prefer to separate layout from logic by keeping the HTML structure in an external file (e.g., `template.html`):
+If you have multiple template variables, nesting them can become deeply indented. The pure OOP approach is to encapsulate the composition inside a custom class representing the view:
+
+```php
+<?php
+
+use PhpResponses\Text;
+use PhpResponses\Number;
+use PhpResponses\TemplateVariable;
+use PhpResponses\TextOfNumber;
+
+final class UserProfileText implements Text {
+    private Text $template;
+    private Text $name;
+    private Number $age;
+
+    public function __construct(Text $template, Text $name, Number $age) {
+        $this->template = $template;
+        $this->name = $name;
+        $this->age = $age;
+    }
+
+    public function string(): string {
+        return (new TemplateVariable(
+            new TemplateVariable(
+                $this->template,
+                "name",
+                $this->name
+            ),
+            "age",
+            new TextOfNumber($this->age)
+        ))->string();
+    }
+}
+```
+
+Because `UserProfileText` implements the `Text` interface, it is fully compatible with the response decorator tree. You can pass it as a drop-in argument directly to `ResponseBody`, which is then wrapped by `ResponseHeader` and `ResponseStatusLineOk`:
 
 ```php
 <?php
@@ -145,27 +229,21 @@ use PhpResponses\MediaToWire;
 use PhpResponses\JsonSubTree;
 use PhpResponses\JsonString;
 use PhpResponses\JsonInt;
-use PhpResponses\Template;
 use PhpResponses\TextOfFile;
-use PhpResponses\TextOfNumber;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
         new ResponseBody(
-            new Template(
+            new UserProfileText(
                 new TextOfFile("template.html"),
-                [
-                    "name" => new JsonString(
-                        new JsonSubTree(new BodyFromEnv(), 'user'),
-                        'name'
-                    ),
-                    "age" => new TextOfNumber(
-                        new JsonInt(
-                            new JsonSubTree(new BodyFromEnv(), 'user'),
-                            'age'
-                        )
-                    )
-                ]
+                new JsonString(
+                    new JsonSubTree(new BodyFromEnv(), 'user'),
+                    'name'
+                ),
+                new JsonInt(
+                    new JsonSubTree(new BodyFromEnv(), 'user'),
+                    'age'
+                )
             )
         ),
         "Content-Type", "text/html"

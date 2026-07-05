@@ -18,9 +18,9 @@ final class MediaToWire implements Media
         return new self();
     }
 
-    public function body(string $content): Media
+    public function body(Text $content): Media
     {
-        echo $content;
+        echo $content->string();
         return new self();
     }
 }
