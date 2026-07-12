@@ -1,14 +1,14 @@
 {
-    "name": "phpresponses/phpresponses",
+    "name": "phpresponse/phpresponse",
     "description": "A web framework in php that respect oop",
     "autoload": {
         "psr-4": {
-            "PhpResponses\\": "src/"
+            "PhpResponse\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PhpResponses\\": "tests/"
+            "PhpResponse\\": "tests/"
         }
     },
     "require-dev": {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpResponses;
+namespace PhpResponse;
 
 use PHPUnit\Framework\TestCase;
 

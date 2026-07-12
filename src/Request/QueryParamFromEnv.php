@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhpResponses\Request;
+namespace PhpResponse\Request;
 
-use PhpResponses\Text;
+use PhpResponse\Text;
 
 final class QueryParamFromEnv implements Text {
     

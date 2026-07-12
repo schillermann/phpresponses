@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace PhpResponses;
+namespace PhpResponse;
 
 use PHPUnit\Framework\TestCase;
-use PhpResponses\Request\BodyFromEnv;
-use PhpResponses\Request\HeaderFromEnv;
-use PhpResponses\Request\MethodFromEnv;
-use PhpResponses\Request\PathFromEnv;
-use PhpResponses\Request\ProtocolFromEnv;
-use PhpResponses\Request\QueryParamFromEnv;
+use PhpResponse\Request\BodyFromEnv;
+use PhpResponse\Request\HeaderFromEnv;
+use PhpResponse\Request\MethodFromEnv;
+use PhpResponse\Request\PathFromEnv;
+use PhpResponse\Request\ProtocolFromEnv;
+use PhpResponse\Request\QueryParamFromEnv;
 
 final class RequestTest extends TestCase
 {

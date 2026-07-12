@@ -1,4 +1,4 @@
-# PhpResponses
+# PhpResponse
 
 A simple web framework in PHP that respects OOP.
 
@@ -22,15 +22,15 @@ Create an `index.php` and use decorators to compose your response:
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\ResponseBody;
-use PhpResponses\ResponseHeader;
-use PhpResponses\ResponseStatusLineOk;
-use PhpResponses\MediaToWire;
-use PhpResponses\LiteralText;
+use PhpResponse\ResponseBody;
+use PhpResponse\ResponseHeader;
+use PhpResponse\ResponseStatusLineOk;
+use PhpResponse\MediaToWire;
+use PhpResponse\LiteralText;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
-        new ResponseBody(new LiteralText("<h1>Hello from PhpResponses!</h1>")),
+        new ResponseBody(new LiteralText("<h1>Hello from PhpResponse!</h1>")),
         "Content-Type", "text/html"
     )
 ))->media(new MediaToWire());
@@ -43,14 +43,14 @@ You can compose request parsing declaratively by encapsulating the request varia
 ```php
 <?php
 
-use PhpResponses\Text;
-use PhpResponses\TemplateVariable;
-use PhpResponses\LiteralText;
-use PhpResponses\FallbackText;
-use PhpResponses\Request\HeaderFromEnv;
-use PhpResponses\Request\MethodFromEnv;
-use PhpResponses\Request\PathFromEnv;
-use PhpResponses\Request\BodyFromEnv;
+use PhpResponse\Text;
+use PhpResponse\TemplateVariable;
+use PhpResponse\LiteralText;
+use PhpResponse\FallbackText;
+use PhpResponse\Request\HeaderFromEnv;
+use PhpResponse\Request\MethodFromEnv;
+use PhpResponse\Request\PathFromEnv;
+use PhpResponse\Request\BodyFromEnv;
 
 final class RequestDetailsText implements Text {
     public function string(): string {
@@ -85,10 +85,10 @@ Now, compose the response cleanly:
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\ResponseStatusLineOk;
-use PhpResponses\ResponseHeader;
-use PhpResponses\ResponseBody;
-use PhpResponses\MediaToWire;
+use PhpResponse\ResponseStatusLineOk;
+use PhpResponse\ResponseHeader;
+use PhpResponse\ResponseBody;
+use PhpResponse\MediaToWire;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
@@ -113,11 +113,11 @@ If you want to render the response using an in-memory template string, define yo
 ```php
 <?php
 
-use PhpResponses\Text;
-use PhpResponses\Number;
-use PhpResponses\TemplateVariable;
-use PhpResponses\LiteralText;
-use PhpResponses\TextOfNumber;
+use PhpResponse\Text;
+use PhpResponse\Number;
+use PhpResponse\TemplateVariable;
+use PhpResponse\LiteralText;
+use PhpResponse\TextOfNumber;
 
 final class UserWelcomeText implements Text {
     private Text $name;
@@ -149,14 +149,14 @@ Now, pass this view to `ResponseBody`:
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\Request\BodyFromEnv;
-use PhpResponses\ResponseStatusLineOk;
-use PhpResponses\ResponseHeader;
-use PhpResponses\ResponseBody;
-use PhpResponses\MediaToWire;
-use PhpResponses\JsonSubTree;
-use PhpResponses\JsonString;
-use PhpResponses\JsonInt;
+use PhpResponse\Request\BodyFromEnv;
+use PhpResponse\ResponseStatusLineOk;
+use PhpResponse\ResponseHeader;
+use PhpResponse\ResponseBody;
+use PhpResponse\MediaToWire;
+use PhpResponse\JsonSubTree;
+use PhpResponse\JsonString;
+use PhpResponse\JsonInt;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(
@@ -184,10 +184,10 @@ If you have multiple template variables, nesting them can become deeply indented
 ```php
 <?php
 
-use PhpResponses\Text;
-use PhpResponses\Number;
-use PhpResponses\TemplateVariable;
-use PhpResponses\TextOfNumber;
+use PhpResponse\Text;
+use PhpResponse\Number;
+use PhpResponse\TemplateVariable;
+use PhpResponse\TextOfNumber;
 
 final class UserProfileText implements Text {
     private Text $template;
@@ -221,15 +221,15 @@ Because `UserProfileText` implements the `Text` interface, it is fully compatibl
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpResponses\Request\BodyFromEnv;
-use PhpResponses\ResponseStatusLineOk;
-use PhpResponses\ResponseHeader;
-use PhpResponses\ResponseBody;
-use PhpResponses\MediaToWire;
-use PhpResponses\JsonSubTree;
-use PhpResponses\JsonString;
-use PhpResponses\JsonInt;
-use PhpResponses\TextOfFile;
+use PhpResponse\Request\BodyFromEnv;
+use PhpResponse\ResponseStatusLineOk;
+use PhpResponse\ResponseHeader;
+use PhpResponse\ResponseBody;
+use PhpResponse\MediaToWire;
+use PhpResponse\JsonSubTree;
+use PhpResponse\JsonString;
+use PhpResponse\JsonInt;
+use PhpResponse\TextOfFile;
 
 (new ResponseStatusLineOk(
     new ResponseHeader(

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpResponses;
+namespace PhpResponse;
 
 final class HeaderFromEnv implements Header
 {
