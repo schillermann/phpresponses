@@ -177,7 +177,7 @@ use PhpResponse\JsonInt;
 ))->media(new MediaToWire());
 ```
 
-### Encapsulated Template Example (Best Practice)
+### Encapsulated Template Example
 
 If you have multiple template variables, nesting them can become deeply indented. The pure OOP approach is to encapsulate the composition inside a custom class representing the view:
 
