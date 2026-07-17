@@ -7,6 +7,7 @@ namespace PhpResponse\Log;
 use PhpResponse\Text;
 use PhpResponse\LiteralText;
 use PhpResponse\FormattedText;
+use PhpResponse\Log\Tag\DebugTag;
 
 final class LoggedText implements Text
 {
@@ -24,7 +25,7 @@ final class LoggedText implements Text
         $result = $this->origin->string();
         $this->log->write(
             new PlainEntry(
-                new LiteralText('DEBUG'),
+                new DebugTag(),
                 new FormattedText(
                     new LiteralText("Evaluated text: '%s'"),
                     new LiteralText($result)

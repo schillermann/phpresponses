@@ -16,6 +16,10 @@ use PhpResponse\Log\TimestampedEntry;
 use PhpResponse\Log\JsonEntry;
 use PhpResponse\Log\FailsafeLog;
 use PhpResponse\Log\LevelLog;
+use PhpResponse\Log\Tag\InfoTag;
+use PhpResponse\Log\Tag\DebugTag;
+use PhpResponse\Log\Tag\ErrorTag;
+use PhpResponse\Log\Tag\WarningTag;
 
 final class LogTest extends TestCase
 {
@@ -25,7 +29,7 @@ final class LogTest extends TestCase
         $this->assertNotFalse($stream);
         
         $log = new StreamLog($stream);
-        $log->write(new PlainEntry(new LiteralText('INFO'), new LiteralText('something happened')));
+        $log->write(new PlainEntry(new InfoTag(), new LiteralText('something happened')));
 
         fseek($stream, 0);
         $content = stream_get_contents($stream);
@@ -44,7 +48,7 @@ final class LogTest extends TestCase
             new BufferLog($buffer2)
         );
 
-        $log->write(new PlainEntry(new LiteralText('ERROR'), new LiteralText('critical issue')));
+        $log->write(new PlainEntry(new ErrorTag(), new LiteralText('critical issue')));
 
         $this->assertCount(1, $buffer1);
         $this->assertCount(1, $buffer2);
@@ -73,7 +77,7 @@ final class LogTest extends TestCase
         $epoch->method('string')->willReturn('2026-07-17T12:00:00Z');
 
         $entry = new TimestampedEntry(
-            new PlainEntry(new LiteralText('INFO'), new LiteralText('test message')),
+            new PlainEntry(new InfoTag(), new LiteralText('test message')),
             $epoch
         );
 
@@ -84,7 +88,7 @@ final class LogTest extends TestCase
     public function testJsonEntryFormatsAsJson(): void
     {
         $entry = new JsonEntry(
-            new PlainEntry(new LiteralText('INFO'), new LiteralText('test message'))
+            new PlainEntry(new InfoTag(), new LiteralText('test message'))
         );
 
         $this->assertSame('INFO', $entry->level()->string());
@@ -97,7 +101,7 @@ final class LogTest extends TestCase
         $failingLog->method('write')->willThrowException(new \RuntimeException('Disk full'));
 
         $log = new FailsafeLog($failingLog);
-        $log->write(new PlainEntry(new LiteralText('ERROR'), new LiteralText('failed task')));
+        $log->write(new PlainEntry(new ErrorTag(), new LiteralText('failed task')));
 
         $this->assertTrue(true);
     }
@@ -107,8 +111,8 @@ final class LogTest extends TestCase
         $buffer = new \ArrayObject();
         $log = new LevelLog(new BufferLog($buffer), 'ERROR', 'WARNING');
 
-        $log->write(new PlainEntry(new LiteralText('INFO'), new LiteralText('ignored')));
-        $log->write(new PlainEntry(new LiteralText('ERROR'), new LiteralText('logged')));
+        $log->write(new PlainEntry(new InfoTag(), new LiteralText('ignored')));
+        $log->write(new PlainEntry(new ErrorTag(), new LiteralText('logged')));
 
         $this->assertCount(1, $buffer);
         $this->assertSame('ERROR: logged', $buffer[0]);

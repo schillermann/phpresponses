@@ -348,6 +348,7 @@ Decorate the business logic with logging behavior:
 ```php
 use PhpResponse\Log\Log;
 use PhpResponse\Log\PlainEntry;
+use PhpResponse\Log\Tag\InfoTag;
 
 final class LoggedRegistration implements Registration
 {
@@ -365,7 +366,7 @@ final class LoggedRegistration implements Registration
         $this->origin->register($username);
         $this->log->write(
             new PlainEntry(
-                new LiteralText('INFO'),
+                new InfoTag(),
                 new FormattedText(
                     new LiteralText("User registered: %s"),
                     new LiteralText($username)
@@ -484,10 +485,11 @@ $notFound = new Header(
 use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\TimestampedEntry;
 use PhpResponse\Log\UtcEpoch;
+use PhpResponse\Log\Tag\InfoTag;
 use PhpResponse\LiteralText;
 
 $timestamped = new TimestampedEntry(
-    new PlainEntry(new LiteralText('INFO'), new LiteralText('Action triggered')),
+    new PlainEntry(new InfoTag(), new LiteralText('Action triggered')),
     new UtcEpoch()
 );
 ```
@@ -499,10 +501,11 @@ Serialize log entry metadata (level and message) into a JSON string:
 ```php
 use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\JsonEntry;
+use PhpResponse\Log\Tag\ErrorTag;
 use PhpResponse\LiteralText;
 
 $jsonEntry = new JsonEntry(
-    new PlainEntry(new LiteralText('ERROR'), new LiteralText('Database down'))
+    new PlainEntry(new ErrorTag(), new LiteralText('Database down'))
 );
 ```
 
@@ -521,6 +524,7 @@ use PhpResponse\Log\TeeLog;
 use PhpResponse\Log\LevelLog;
 use PhpResponse\Log\FailsafeLog;
 use PhpResponse\Log\PlainEntry;
+use PhpResponse\Log\Tag\ErrorTag;
 use PhpResponse\LiteralText;
 
 // Setup a failsafe, level-filtered log writing to both console and file
@@ -535,6 +539,6 @@ $log = new FailsafeLog(
 );
 
 // This entry will be written to stdout and app.log
-$log->write(new PlainEntry(new LiteralText('ERROR'), new LiteralText('Disk almost full')));
+$log->write(new PlainEntry(new ErrorTag(), new LiteralText('Disk almost full')));
 ```
 
