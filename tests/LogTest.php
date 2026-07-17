@@ -18,10 +18,10 @@ use PhpResponse\Log\FailsafeLog;
 use PhpResponse\Log\LevelLog;
 use PhpResponse\Log\FileLog;
 use PhpResponse\Log\ConsoleLog;
-use PhpResponse\Log\Tag\InfoTag;
-use PhpResponse\Log\Tag\DebugTag;
-use PhpResponse\Log\Tag\ErrorTag;
-use PhpResponse\Log\Tag\WarningTag;
+use PhpResponse\Log\Level\InfoLevel;
+use PhpResponse\Log\Level\DebugLevel;
+use PhpResponse\Log\Level\ErrorLevel;
+use PhpResponse\Log\Level\WarningLevel;
 
 final class LogTest extends TestCase
 {
@@ -31,7 +31,7 @@ final class LogTest extends TestCase
         $this->assertNotFalse($stream);
         
         $log = new StreamLog($stream);
-        $log->write(new PlainEntry(new InfoTag(), new LiteralText('something happened')));
+        $log->write(new PlainEntry(new InfoLevel(), new LiteralText('something happened')));
 
         fseek($stream, 0);
         $content = stream_get_contents($stream);
@@ -50,7 +50,7 @@ final class LogTest extends TestCase
             new BufferLog($buffer2)
         );
 
-        $log->write(new PlainEntry(new ErrorTag(), new LiteralText('critical issue')));
+        $log->write(new PlainEntry(new ErrorLevel(), new LiteralText('critical issue')));
 
         $this->assertCount(1, $buffer1);
         $this->assertCount(1, $buffer2);
@@ -79,7 +79,7 @@ final class LogTest extends TestCase
         $epoch->method('string')->willReturn('2026-07-17T12:00:00Z');
 
         $entry = new TimestampedEntry(
-            new PlainEntry(new InfoTag(), new LiteralText('test message')),
+            new PlainEntry(new InfoLevel(), new LiteralText('test message')),
             $epoch
         );
 
@@ -90,7 +90,7 @@ final class LogTest extends TestCase
     public function testJsonEntryFormatsAsJson(): void
     {
         $entry = new JsonEntry(
-            new PlainEntry(new InfoTag(), new LiteralText('test message'))
+            new PlainEntry(new InfoLevel(), new LiteralText('test message'))
         );
 
         $this->assertSame('INFO', $entry->level()->string());
@@ -103,7 +103,7 @@ final class LogTest extends TestCase
         $failingLog->method('write')->willThrowException(new \RuntimeException('Disk full'));
 
         $log = new FailsafeLog($failingLog);
-        $log->write(new PlainEntry(new ErrorTag(), new LiteralText('failed task')));
+        $log->write(new PlainEntry(new ErrorLevel(), new LiteralText('failed task')));
 
         $this->assertTrue(true);
     }
@@ -111,10 +111,10 @@ final class LogTest extends TestCase
     public function testLevelLogAllowsMatchingLevels(): void
     {
         $buffer = new \ArrayObject();
-        $log = new LevelLog(new BufferLog($buffer), 'ERROR', 'WARNING');
+        $log = new LevelLog(new BufferLog($buffer), new ErrorLevel(), new WarningLevel());
 
-        $log->write(new PlainEntry(new InfoTag(), new LiteralText('ignored')));
-        $log->write(new PlainEntry(new ErrorTag(), new LiteralText('logged')));
+        $log->write(new PlainEntry(new InfoLevel(), new LiteralText('ignored')));
+        $log->write(new PlainEntry(new ErrorLevel(), new LiteralText('logged')));
 
         $this->assertCount(1, $buffer);
         $this->assertSame('ERROR: logged', $buffer[0]);
@@ -126,7 +126,7 @@ final class LogTest extends TestCase
         $this->assertNotFalse($path);
         
         $log = new FileLog(new LiteralText($path));
-        $log->write(new PlainEntry(new InfoTag(), new LiteralText('test file logging')));
+        $log->write(new PlainEntry(new InfoLevel(), new LiteralText('test file logging')));
 
         $content = file_get_contents($path);
         unlink($path);
@@ -137,13 +137,10 @@ final class LogTest extends TestCase
     public function testConsoleLogWritesToStdout(): void
     {
         $log = new ConsoleLog();
-        // ConsoleLog wraps a FileLog writing to php://stdout.
-        // We call write to verify it executes without error.
         ob_start();
-        $log->write(new PlainEntry(new InfoTag(), new LiteralText('test console logging')));
+        $log->write(new PlainEntry(new InfoLevel(), new LiteralText('test console logging')));
         $content = ob_get_clean();
         
-        // Since php://stdout outputs directly to stdout, we can assert true to verify execution.
         $this->assertTrue(true);
     }
 }

@@ -348,7 +348,7 @@ Decorate the business logic with logging behavior:
 ```php
 use PhpResponse\Log\Log;
 use PhpResponse\Log\PlainEntry;
-use PhpResponse\Log\Tag\InfoTag;
+use PhpResponse\Log\Level\InfoLevel;
 
 final class LoggedRegistration implements Registration
 {
@@ -366,7 +366,7 @@ final class LoggedRegistration implements Registration
         $this->origin->register($username);
         $this->log->write(
             new PlainEntry(
-                new InfoTag(),
+                new InfoLevel(),
                 new FormattedText(
                     new LiteralText("User registered: %s"),
                     new LiteralText($username)
@@ -381,11 +381,11 @@ At runtime, compose the object graph:
 
 ```php
 use PhpResponse\Log\FileLog;
-use PhpResponse\LiteralText;
+use PhpResponse\ProjectPath;
 
 $registration = new LoggedRegistration(
     new UserRegistration(),
-    new FileLog(new LiteralText('app.log'))
+    new FileLog(new ProjectPath('app.log'))
 );
 
 $registration->register("john_doe");
@@ -453,11 +453,12 @@ use PhpResponse\Route\ExactPath;
 use PhpResponse\Request\Body as RequestBody;
 use PhpResponse\JsonString;
 use PhpResponse\Log\FileLog;
+use PhpResponse\ProjectPath;
 
 // 1. Instantiate the logging-decorated registration service
 $registration = new LoggedRegistration(
     new UserRegistration(),
-    new FileLog(new LiteralText('app.log'))
+    new FileLog(new ProjectPath('app.log'))
 );
 
 // 2. Define fallback response
@@ -480,33 +481,33 @@ $notFound = new Header(
 ))->media(new Wire());
 ```
 
-### With Timestamp
+### Log With Timestamp
 
 ```php
 use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\TimestampedEntry;
 use PhpResponse\Log\UtcEpoch;
-use PhpResponse\Log\Tag\InfoTag;
+use PhpResponse\Log\Level\InfoLevel;
 use PhpResponse\LiteralText;
 
 $timestamped = new TimestampedEntry(
-    new PlainEntry(new InfoTag(), new LiteralText('Action triggered')),
+    new PlainEntry(new InfoLevel(), new LiteralText('Action triggered')),
     new UtcEpoch()
 );
 ```
 
-### With JSON Format
+### Log With JSON Format
 
 Serialize log entry metadata (level and message) into a JSON string:
 
 ```php
 use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\JsonEntry;
-use PhpResponse\Log\Tag\ErrorTag;
+use PhpResponse\Log\Level\ErrorLevel;
 use PhpResponse\LiteralText;
 
 $jsonEntry = new JsonEntry(
-    new PlainEntry(new ErrorTag(), new LiteralText('Database down'))
+    new PlainEntry(new ErrorLevel(), new LiteralText('Database down'))
 );
 ```
 
@@ -528,7 +529,9 @@ use PhpResponse\Log\TeeLog;
 use PhpResponse\Log\LevelLog;
 use PhpResponse\Log\FailsafeLog;
 use PhpResponse\Log\PlainEntry;
-use PhpResponse\Log\Tag\ErrorTag;
+use PhpResponse\Log\Level\ErrorLevel;
+use PhpResponse\Log\Level\WarningLevel;
+use PhpResponse\ProjectPath;
 use PhpResponse\LiteralText;
 
 // Setup a failsafe, level-filtered log writing to both console and file
@@ -536,13 +539,13 @@ $log = new FailsafeLog(
     new LevelLog(
         new TeeLog(
             new ConsoleLog(),
-            new FileLog(new LiteralText('app.log'))
+            new FileLog(new ProjectPath('app.log'))
         ),
-        'ERROR', 'WARNING'
+        new ErrorLevel(),
+        new WarningLevel()
     )
 );
 
 // This entry will be written to stdout and app.log
-$log->write(new PlainEntry(new ErrorTag(), new LiteralText('Disk almost full')));
+$log->write(new PlainEntry(new ErrorLevel(), new LiteralText('Disk almost full')));
 ```
-

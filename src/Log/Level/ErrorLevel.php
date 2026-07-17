@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhpResponse\Log\Tag;
+namespace PhpResponse\Log\Level;
 
-use PhpResponse\Text;
-
-final class ErrorTag implements Text
+final class ErrorLevel implements LogLevel
 {
     public function string(): string
     {
