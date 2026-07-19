@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace PhpResponse;
+use PhpResponse\Text\LiteralText;
+use PhpResponse\Text\TemplateVariable;
 
 use PHPUnit\Framework\TestCase;
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace PhpResponse\Log;
 
 use PhpResponse\Text;
-use PhpResponse\FormattedText;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\FormattedText;
+use PhpResponse\Text\LiteralText;
 
 final class TimestampedEntry implements LogEntry
 {

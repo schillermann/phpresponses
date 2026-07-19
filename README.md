@@ -26,7 +26,7 @@ use PhpResponse\Response\Body;
 use PhpResponse\Response\Header;
 use PhpResponse\Response\StatusLine\Ok;
 use PhpResponse\Response\Media\Wire;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 
 (new Ok(
     new Header(
@@ -42,7 +42,9 @@ use PhpResponse\LiteralText;
 
 Detailed topics are split into separate files for easy overview:
 
-- **[Request Handling](docs/requests.md)**: Covers declarative request parsing (header, method, path, body, protocol, query parameters) and JSON subtree extraction.
+- **[Request Handling](docs/requests.md)**: Covers declarative request parsing (header, method, path, body, protocol, query parameters).
+- **[JSON Handling](docs/json.md)**: Covers parsing incoming JSON requests and declaratively building JSON responses.
+- **[Status Lines & Headers](docs/statusline.md)**: Covers HTTP status codes, redirects, and specialized content-type headers.
 - **[Templating](docs/templating.md)**: Covers rendering view templates using variables, external files, and OOP view encapsulation.
 - **[Caching](docs/caching.md)**: Covers caching results for performance using the `StickyText` decorator.
 - **[Routing](docs/routing.md)**: Explains declarative route matching using decorators like `Method`, `ExactPath`, and `RegexPath`.

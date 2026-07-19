@@ -15,7 +15,7 @@ You should use `StickyText` whenever reading the original `Text` (such as `PhpRe
 <?php
 
 use PhpResponse\Request\Body;
-use PhpResponse\StickyText;
+use PhpResponse\Text\StickyText;
 
 // The request body is read only once upon the first call to string()
 $body = new StickyText(new Body());

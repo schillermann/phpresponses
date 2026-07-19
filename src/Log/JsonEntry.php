@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PhpResponse\Log;
 
 use PhpResponse\Text;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 
 final class JsonEntry implements LogEntry
 {

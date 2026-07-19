@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace PhpResponse;
+use PhpResponse\Text\LiteralText;
 
 use PHPUnit\Framework\TestCase;
 use PhpResponse\Response\Body;

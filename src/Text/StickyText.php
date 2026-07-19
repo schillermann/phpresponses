@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhpResponse;
+namespace PhpResponse\Text;
+
+use PhpResponse\Text;
 
 final class StickyText implements Text
 {

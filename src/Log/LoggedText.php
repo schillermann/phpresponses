@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace PhpResponse\Log;
 
 use PhpResponse\Text;
-use PhpResponse\LiteralText;
-use PhpResponse\FormattedText;
+use PhpResponse\Text\LiteralText;
+use PhpResponse\Text\FormattedText;
 use PhpResponse\Log\Level\DebugLevel;
 
 final class LoggedText implements Text

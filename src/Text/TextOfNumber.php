@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace PhpResponse;
+namespace PhpResponse\Text;
+
+use PhpResponse\Text;
+use PhpResponse\Number;
 
 final class TextOfNumber implements Text {
     

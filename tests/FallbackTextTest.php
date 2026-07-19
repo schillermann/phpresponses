@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace PhpResponse;
+use PhpResponse\Text\LiteralText;
+use PhpResponse\Text\FallbackText;
 
 use PHPUnit\Framework\TestCase;
 

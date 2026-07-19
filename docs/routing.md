@@ -15,7 +15,7 @@ use PhpResponse\Response\StatusLine\Ok;
 use PhpResponse\Response\Header;
 use PhpResponse\Response\Body;
 use PhpResponse\Response\Media\Wire;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 use PhpResponse\Route\Method;
 use PhpResponse\Route\RegexPath;
 use PhpResponse\Route\ExactPath;

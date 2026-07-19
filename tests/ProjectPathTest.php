@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace PhpResponse;
+use PhpResponse\Text\ProjectPath;
 
 use PHPUnit\Framework\TestCase;
 

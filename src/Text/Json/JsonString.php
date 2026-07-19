@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpResponse;
+namespace PhpResponse\Text\Json;
 
-final class JsonString implements Text 
+use PhpResponse\Text;
+
+final class JsonString implements Json
 {
     private Text $origin;
     private string $key;

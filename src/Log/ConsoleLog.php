@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpResponse\Log;
 
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 
 final class ConsoleLog implements Log
 {

@@ -8,9 +8,9 @@ This section covers how to render views and templates using decorators like `Tem
 
 `PhpResponse` provides several classes to compile templates dynamically:
 
-- **`PhpResponse\TemplateVariable`**: Decorator that replaces `${name}` placeholders in a template string with the string representation of another `Text` object.
-- **`PhpResponse\TextOfFile`**: Reads raw content from an external file (e.g., HTML template files).
-- **`PhpResponse\TextOfNumber`**: Converts a `Number` object to a `Text` object.
+- **`PhpResponse\Text\TemplateVariable`**: Decorator that replaces `${name}` placeholders in a template string with the string representation of another `Text` object.
+- **`PhpResponse\Text\TextOfFile`**: Reads raw content from an external file (e.g., HTML template files).
+- **`PhpResponse\Text\TextOfNumber`**: Converts a `Number` object to a `Text` object.
 
 ---
 
@@ -23,9 +23,9 @@ If you want to render a response using an in-memory template string, define your
 
 use PhpResponse\Text;
 use PhpResponse\Number;
-use PhpResponse\TemplateVariable;
-use PhpResponse\LiteralText;
-use PhpResponse\TextOfNumber;
+use PhpResponse\Text\TemplateVariable;
+use PhpResponse\Text\LiteralText;
+use PhpResponse\Text\TextOfNumber;
 
 final class UserWelcomeText implements Text {
     private Text $name;
@@ -62,8 +62,8 @@ use PhpResponse\Response\StatusLine\Ok;
 use PhpResponse\Response\Header;
 use PhpResponse\Response\Body as ResponseBody;
 use PhpResponse\Response\Media\Wire;
-use PhpResponse\JsonSubTree;
-use PhpResponse\JsonString;
+use PhpResponse\Text\Json\JsonSubTree;
+use PhpResponse\Text\Json\JsonString;
 use PhpResponse\JsonInt;
 
 (new Ok(
@@ -96,8 +96,8 @@ If you have multiple template variables, nesting them can become deeply indented
 
 use PhpResponse\Text;
 use PhpResponse\Number;
-use PhpResponse\TemplateVariable;
-use PhpResponse\TextOfNumber;
+use PhpResponse\Text\TemplateVariable;
+use PhpResponse\Text\TextOfNumber;
 
 final class UserProfileText implements Text {
     private Text $template;
@@ -136,10 +136,10 @@ use PhpResponse\Response\StatusLine\Ok;
 use PhpResponse\Response\Header;
 use PhpResponse\Response\Body as ResponseBody;
 use PhpResponse\Response\Media\Wire;
-use PhpResponse\JsonSubTree;
-use PhpResponse\JsonString;
+use PhpResponse\Text\Json\JsonSubTree;
+use PhpResponse\Text\Json\JsonString;
 use PhpResponse\JsonInt;
-use PhpResponse\TextOfFile;
+use PhpResponse\Text\TextOfFile;
 
 (new Ok(
     new Header(

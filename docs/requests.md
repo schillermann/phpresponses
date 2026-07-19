@@ -23,15 +23,15 @@ You can compose request parsing declaratively by encapsulating request variables
 <?php
 
 use PhpResponse\Text;
-use PhpResponse\LiteralText;
-use PhpResponse\FallbackText;
+use PhpResponse\Text\LiteralText;
+use PhpResponse\Text\FallbackText;
 use PhpResponse\Request\Header;
 use PhpResponse\Request\Method;
 use PhpResponse\Request\Path;
 use PhpResponse\Request\Protocol;
 use PhpResponse\Request\QueryParam;
 use PhpResponse\Request\Body;
-use PhpResponse\TemplateVariable;
+use PhpResponse\Text\TemplateVariable;
 
 final class RequestDetailsText implements Text {
     public function string(): string {
@@ -65,28 +65,6 @@ final class RequestDetailsText implements Text {
 
 ---
 
-## JSON Request Parsing & Extraction
+## JSON Request Parsing
 
-You can parse JSON requests declaratively by wrapping the request body in decorators that extract specific subtrees or typed properties:
-
-- **`PhpResponse\JsonSubTree`**: Extracts a JSON subtree by key and returns it as a JSON-encoded string.
-- **`PhpResponse\JsonString`**: Extracts a string field by key from a JSON string. Throws `DomainException` if the value is missing or not a string.
-- **`PhpResponse\JsonInt`**: Extracts an integer field by key from a JSON string, implementing the `Number` interface. Throws `DomainException` if the value is missing or not an integer.
-
-### JSON Extraction Example
-
-```php
-<?php
-
-use PhpResponse\Request\Body;
-use PhpResponse\JsonSubTree;
-use PhpResponse\JsonString;
-use PhpResponse\JsonInt;
-
-// Extract a sub-object from the JSON request body: {"user": {"name": "Alice", "age": 30}}
-$userSubTree = new JsonSubTree(new Body(), 'user');
-
-// Extract properties from the sub-object
-$name = new JsonString($userSubTree, 'name');
-$age = new JsonInt($userSubTree, 'age'); // Implements Number
-```
+To parse JSON requests (e.g. extracting nested subtrees or properties), see the dedicated **[JSON Handling](json.md)** documentation.

@@ -68,7 +68,7 @@ At runtime, compose the object graph:
 
 ```php
 use PhpResponse\Log\FileLog;
-use PhpResponse\ProjectPath;
+use PhpResponse\Text\ProjectPath;
 
 $registration = new LoggedRegistration(
     new UserRegistration(),
@@ -89,8 +89,8 @@ use PhpResponse\Response\Header;
 use PhpResponse\Response\Body as ResponseBody;
 use PhpResponse\Response\Media\Media;
 use PhpResponse\Text;
-use PhpResponse\LiteralText;
-use PhpResponse\FormattedText;
+use PhpResponse\Text\LiteralText;
+use PhpResponse\Text\FormattedText;
 
 final class RegistrationResponse implements Response
 {
@@ -134,13 +134,13 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpResponse\Response\Header;
 use PhpResponse\Response\Body as ResponseBody;
 use PhpResponse\Response\Media\Wire;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 use PhpResponse\Route\Method;
 use PhpResponse\Route\ExactPath;
 use PhpResponse\Request\Body as RequestBody;
-use PhpResponse\JsonString;
+use PhpResponse\Text\Json\JsonString;
 use PhpResponse\Log\FileLog;
-use PhpResponse\ProjectPath;
+use PhpResponse\Text\ProjectPath;
 
 // 1. Instantiate the logging-decorated registration service
 $registration = new LoggedRegistration(
@@ -177,7 +177,7 @@ use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\TimestampedEntry;
 use PhpResponse\Log\UtcEpoch;
 use PhpResponse\Log\Level\InfoLevel;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 
 $timestamped = new TimestampedEntry(
     new PlainEntry(new InfoLevel(), new LiteralText('Action triggered')),
@@ -195,7 +195,7 @@ Serialize log entry metadata (level and message) into a JSON string:
 use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\JsonEntry;
 use PhpResponse\Log\Level\ErrorLevel;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\LiteralText;
 
 $jsonEntry = new JsonEntry(
     new PlainEntry(new ErrorLevel(), new LiteralText('Database down'))
@@ -223,8 +223,8 @@ use PhpResponse\Log\FailsafeLog;
 use PhpResponse\Log\PlainEntry;
 use PhpResponse\Log\Level\ErrorLevel;
 use PhpResponse\Log\Level\WarningLevel;
-use PhpResponse\ProjectPath;
-use PhpResponse\LiteralText;
+use PhpResponse\Text\ProjectPath;
+use PhpResponse\Text\LiteralText;
 
 // Setup a failsafe, level-filtered log writing to both console and file
 $log = new FailsafeLog(

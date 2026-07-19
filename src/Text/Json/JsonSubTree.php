@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpResponse;
+namespace PhpResponse\Text\Json;
 
-final class JsonSubTree implements Text 
+use PhpResponse\Text;
+
+final class JsonSubTree implements Json
 {
     private Text $origin;
     private string $key;
