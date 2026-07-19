@@ -42,6 +42,8 @@ use PhpResponse\LiteralText;
 
 Detailed topics are split into separate files for easy overview:
 
-- **[Request Handling, Templating & Caching](docs/requests.md)**: Covers declarative request parsing (header, method, path, body), templates, JSON subtree extraction, and `StickyText` caching.
+- **[Request Handling](docs/requests.md)**: Covers declarative request parsing (header, method, path, body, protocol, query parameters) and JSON subtree extraction.
+- **[Templating](docs/templating.md)**: Covers rendering view templates using variables, external files, and OOP view encapsulation.
+- **[Caching](docs/caching.md)**: Covers caching results for performance using the `StickyText` decorator.
 - **[Routing](docs/routing.md)**: Explains declarative route matching using decorators like `Method`, `ExactPath`, and `RegexPath`.
 - **[Logging](docs/logging.md)**: Covers SRP-respecting logger decoration, timestamp/JSON logging entry options, and targets like `TeeLog`, `FileLog`, and `LevelLog`.

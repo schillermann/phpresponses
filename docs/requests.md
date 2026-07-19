@@ -1,24 +1,37 @@
-# Request Handling, Templating, and Caching
+# Request Handling
 
-This section covers how to handle request data (such as headers, methods, paths, and body content), parse JSON requests, render template views, and cache results for optimal performance in `PhpResponse`.
+This section covers how to handle request data (such as headers, methods, paths, protocol, query parameters, and body content) and parse JSON requests in `PhpResponse`.
 
 ---
 
-## Request Example
+## HTTP Request Components
 
-You can compose request parsing declaratively by encapsulating the request variables in a custom class representing the request details:
+`PhpResponse` provides several decorators to extract details from the active HTTP request:
+
+- **`PhpResponse\Request\Method`**: Extracts the HTTP request method (e.g., `GET`, `POST`, `PUT`, `DELETE`).
+- **`PhpResponse\Request\Path`**: Extracts the path of the request URI (e.g., `/users/123`).
+- **`PhpResponse\Request\Header`**: Extracts a specific HTTP request header (e.g., `User-Agent`, `Accept`).
+- **`PhpResponse\Request\Protocol`**: Extracts the server protocol (e.g., `HTTP/1.1`, `HTTP/2.0`).
+- **`PhpResponse\Request\QueryParam`**: Extracts a query parameter from the URL. Throws an `OutOfBoundsException` if the parameter is missing.
+- **`PhpResponse\Request\Body`**: Reads the raw request body stream.
+
+### Request Extraction Example
+
+You can compose request parsing declaratively by encapsulating request variables in a custom view class:
 
 ```php
 <?php
 
 use PhpResponse\Text;
-use PhpResponse\TemplateVariable;
 use PhpResponse\LiteralText;
 use PhpResponse\FallbackText;
 use PhpResponse\Request\Header;
 use PhpResponse\Request\Method;
 use PhpResponse\Request\Path;
+use PhpResponse\Request\Protocol;
+use PhpResponse\Request\QueryParam;
 use PhpResponse\Request\Body;
+use PhpResponse\TemplateVariable;
 
 final class RequestDetailsText implements Text {
     public function string(): string {
@@ -26,12 +39,16 @@ final class RequestDetailsText implements Text {
             new TemplateVariable(
                 new TemplateVariable(
                     new TemplateVariable(
-                        new LiteralText("<html><body><h1>Your Browser: ${agent}</h1><p>Method: ${method}</p><p>Path: ${path}</p><p>Body: ${body}</p></body></html>"),
-                        "agent",
-                        new FallbackText(
-                            new Header("User-Agent"),
-                            new LiteralText("Unknown")
-                        )
+                        new TemplateVariable(
+                            new LiteralText("<html><body><h1>Browser: ${agent}</h1><p>Protocol: ${proto}</p><p>Method: ${method}</p><p>Path: ${path}</p><p>Body: ${body}</p></body></html>"),
+                            "agent",
+                            new FallbackText(
+                                new Header("User-Agent"),
+                                new LiteralText("Unknown")
+                            )
+                        ),
+                        "proto",
+                        new Protocol()
                     ),
                     "method",
                     new Method()
@@ -46,200 +63,30 @@ final class RequestDetailsText implements Text {
 }
 ```
 
-Now, compose the response cleanly:
-
-```php
-<?php
-
-require_once __DIR__ . '/vendor/autoload.php';
-
-use PhpResponse\Response\StatusLine\Ok;
-use PhpResponse\Response\Header;
-use PhpResponse\Response\Body;
-use PhpResponse\Response\Media\Wire;
-
-(new Ok(
-    new Header(
-        new Body(
-            new RequestDetailsText()
-        ),
-        "Content-Type", "text/html"
-    )
-))->media(new Wire());
-```
-
-Now just open this file in your browser via a web server (like `php -S localhost:8000`).
-
 ---
 
-## JSON Request Example
+## JSON Request Parsing & Extraction
 
-You can parse JSON requests declaratively using template variables.
+You can parse JSON requests declaratively by wrapping the request body in decorators that extract specific subtrees or typed properties:
 
-### Inline Template Example
+- **`PhpResponse\JsonSubTree`**: Extracts a JSON subtree by key and returns it as a JSON-encoded string.
+- **`PhpResponse\JsonString`**: Extracts a string field by key from a JSON string. Throws `DomainException` if the value is missing or not a string.
+- **`PhpResponse\JsonInt`**: Extracts an integer field by key from a JSON string, implementing the `Number` interface. Throws `DomainException` if the value is missing or not an integer.
 
-If you want to render the response using an in-memory template string, define your view class:
-
-```php
-<?php
-
-use PhpResponse\Text;
-use PhpResponse\Number;
-use PhpResponse\TemplateVariable;
-use PhpResponse\LiteralText;
-use PhpResponse\TextOfNumber;
-
-final class UserWelcomeText implements Text {
-    private Text $name;
-    private Number $age;
-
-    public function __construct(Text $name, Number $age) {
-        $this->name = $name;
-        $this->age = $age;
-    }
-
-    public function string(): string {
-        return (new TemplateVariable(
-            new TemplateVariable(
-                new LiteralText("<html><body><h1>Hello, ${name}!</h1><p>You are ${age} years old.</p></body></html>"),
-                "name",
-                $this->name
-            ),
-            "age",
-            new TextOfNumber($this->age)
-        ))->string();
-    }
-}
-```
-
-Now, pass this view to `Body`:
+### JSON Extraction Example
 
 ```php
 <?php
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 use PhpResponse\Request\Body;
-use PhpResponse\Response\StatusLine\Ok;
-use PhpResponse\Response\Header;
-use PhpResponse\Response\Body as ResponseBody;
-use PhpResponse\Response\Media\Wire;
 use PhpResponse\JsonSubTree;
 use PhpResponse\JsonString;
 use PhpResponse\JsonInt;
 
-(new Ok(
-    new Header(
-        new ResponseBody(
-            new UserWelcomeText(
-                new JsonString(
-                    new JsonSubTree(new Body(), 'user'),
-                    'name'
-                ),
-                new JsonInt(
-                    new JsonSubTree(new Body(), 'user'),
-                    'age'
-                )
-            )
-        ),
-        "Content-Type", "text/html"
-    )
-))->media(new Wire());
-```
+// Extract a sub-object from the JSON request body: {"user": {"name": "Alice", "age": 30}}
+$userSubTree = new JsonSubTree(new Body(), 'user');
 
-### Encapsulated Template Example
-
-If you have multiple template variables, nesting them can become deeply indented. The pure OOP approach is to encapsulate the composition inside a custom class representing the view:
-
-```php
-<?php
-
-use PhpResponse\Text;
-use PhpResponse\Number;
-use PhpResponse\TemplateVariable;
-use PhpResponse\TextOfNumber;
-
-final class UserProfileText implements Text {
-    private Text $template;
-    private Text $name;
-    private Number $age;
-
-    public function __construct(Text $template, Text $name, Number $age) {
-        $this->template = $template;
-        $this->name = $name;
-        $this->age = $age;
-    }
-
-    public function string(): string {
-        return (new TemplateVariable(
-            new TemplateVariable(
-                $this->template,
-                "name",
-                $this->name
-            ),
-            "age",
-            new TextOfNumber($this->age)
-        ))->string();
-    }
-}
-```
-
-Because `UserProfileText` implements the `Text` interface, it is fully compatible with the response decorator tree. You can pass it as a drop-in argument directly to `Body`, which is then wrapped by `Header` and `StatusLine\Ok`:
-
-```php
-<?php
-
-require_once __DIR__ . '/vendor/autoload.php';
-
-use PhpResponse\Request\Body;
-use PhpResponse\Response\StatusLine\Ok;
-use PhpResponse\Response\Header;
-use PhpResponse\Response\Body as ResponseBody;
-use PhpResponse\Response\Media\Wire;
-use PhpResponse\JsonSubTree;
-use PhpResponse\JsonString;
-use PhpResponse\JsonInt;
-use PhpResponse\TextOfFile;
-
-(new Ok(
-    new Header(
-        new ResponseBody(
-            new UserProfileText(
-                new TextOfFile("template.html"),
-                new JsonString(
-                    new JsonSubTree(new Body(), 'user'),
-                    'name'
-                ),
-                new JsonInt(
-                    new JsonSubTree(new Body(), 'user'),
-                    'age'
-                )
-            )
-        ),
-        "Content-Type", "text/html"
-    )
-))->media(new Wire());
-```
-
----
-
-## Caching and Performance with StickyText
-
-The `Body` object should only do one thing: read the request body from the input stream.
-If you want to add a caching feature, use `StickyText` as a decorator.
-
-You should use `StickyText` whenever reading the original `Text` like `Body` has side effects or a high performance cost (e.g., repeatedly reading streams, querying files, or calling external APIs).
-
-```php
-use PhpResponse\Request\Body;
-use PhpResponse\StickyText;
-
-// The request body is read only once upon the first call to string()
-$body = new StickyText(new Body());
-
-// First call: reads from stream and caches the result
-$content = $body->string();
-
-// Second call: retrieves from memory instantly
-$contentAgain = $body->string();
+// Extract properties from the sub-object
+$name = new JsonString($userSubTree, 'name');
+$age = new JsonInt($userSubTree, 'age'); // Implements Number
 ```
