@@ -8,12 +8,13 @@ This section covers how to handle request data (such as headers, methods, paths,
 
 `PhpResponse` provides several decorators to extract details from the active HTTP request:
 
-- **`PhpResponse\Request\Method`**: Extracts the HTTP request method (e.g., `GET`, `POST`, `PUT`, `DELETE`).
-- **`PhpResponse\Request\Path`**: Extracts the path of the request URI (e.g., `/users/123`).
-- **`PhpResponse\Request\Header`**: Extracts a specific HTTP request header (e.g., `User-Agent`, `Accept`).
-- **`PhpResponse\Request\Protocol`**: Extracts the server protocol (e.g., `HTTP/1.1`, `HTTP/2.0`).
-- **`PhpResponse\Request\QueryParam`**: Extracts a query parameter from the URL. Throws an `OutOfBoundsException` if the parameter is missing.
-- **`PhpResponse\Request\Body`**: Reads the raw request body stream.
+- **[`PhpResponse\Request\Method`](../src/Request/Method.php)**: Extracts the HTTP request method (e.g., `GET`, `POST`, `PUT`, `DELETE`).
+- **[`PhpResponse\Request\Path`](../src/Request/Path.php)**: Extracts the path of the request URI (e.g., `/users/123`).
+- **[`PhpResponse\Request\Header`](../src/Request/Header.php)**: Extracts a specific HTTP request header (e.g., `User-Agent`, `Accept`).
+- **[`PhpResponse\Request\Protocol`](../src/Request/Protocol.php)**: Extracts the server protocol (e.g., `HTTP/1.1`, `HTTP/2.0`).
+- **[`PhpResponse\Request\QueryParam`](../src/Request/QueryParam.php)**: Extracts a query parameter from the URL. Throws an `OutOfBoundsException` if the parameter is missing.
+- **[`PhpResponse\Request\PathParam`](../src/Request/PathParam.php)**: Dynamically extracts path parameters using regex capture groups from the request path.
+- **[`PhpResponse\Request\Body`](../src/Request/Body.php)**: Reads the raw request body stream.
 
 ### Request Extraction Example
 

@@ -4,7 +4,10 @@ This section covers how routing is handled declaratively in `PhpResponse`.
 
 ---
 
-We compose routes cleanly using a decorator chain (Chain of Responsibility). The routing criteria themselves are `Response` decorators that either delegate to a `target` response on match, or a `fallback` response on mismatch:
+We compose routes cleanly using a decorator chain (Chain of Responsibility).
+The routing criteria themselves are `Response` decorators that either delegate to a `target` response on match, or a `fallback` response on mismatch.
+
+## Basic Route Matching
 
 ```php
 <?php
@@ -42,4 +45,49 @@ $notFound = new Header(
         $notFound
     )
 ))->media(new Wire());
+```
+
+---
+
+## Route Groups (`PrefixPath`) & Relative Routing (`StripPrefix`)
+
+You can group routes under a common path prefix (such as `/api/v1`) using `PrefixPath`.
+Combine it with `StripPrefix` to build relative nested route trees:
+
+```php
+use PhpResponse\Route\PrefixPath;
+use PhpResponse\Route\ExactPath;
+use PhpResponse\Text\StripPrefix;
+use PhpResponse\Request\Path;
+
+$fullPath = new Path();
+$relative = new StripPrefix("/api/v1", $fullPath);
+
+$apiRoutes = new PrefixPath(
+    "/api/v1",
+    new ExactPath(
+        "/users",
+        $listUsersResponse,
+        $notFoundResponse,
+        $relative
+    ),
+    $notFoundResponse,
+    $fullPath
+);
+```
+
+---
+
+## Dynamic Path Parameter Extraction (`PathParam`)
+
+Path parameters are extracted without mutable context bags by passing a `PathParam` (which implements `Text`) to target components:
+
+```php
+use PhpResponse\Request\PathParam;
+
+// Extract named capture group 'id' dynamically
+$userId = new PathParam("#^/users/(?<id>\d+)$#", "id");
+
+// Extract numeric capture group 1 dynamically
+$orderId = new PathParam("#^/orders/(\d+)$#", 1);
 ```
