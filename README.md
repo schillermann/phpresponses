@@ -42,8 +42,8 @@ use PhpResponse\Text\LiteralText;
 
 Detailed topics are split into separate files for easy overview:
 
-- **[Request Handling](docs/requests.md)**: Covers declarative request parsing (header, method, path, body, protocol, query parameters).
-- **[JSON Handling](docs/json.md)**: Covers parsing incoming JSON requests and declaratively building JSON responses.
+- **[Request](docs/requests.md)**: Covers declarative request parsing (header, method, path, body, protocol, query/form parameters, cookies, file uploads).
+- **[JSON](docs/json.md)**: Covers parsing incoming JSON requests and declaratively building JSON responses.
 - **[Headers](docs/headers.md)**: Covers HTTP status codes, response headers, redirects, and specialized content-type headers.
 - **[Templating](docs/templating.md)**: Covers rendering view templates using variables, external files, and OOP view encapsulation.
 - **[Caching](docs/caching.md)**: Covers caching results for performance using the `StickyText` decorator.
